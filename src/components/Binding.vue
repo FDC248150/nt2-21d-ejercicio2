@@ -1,7 +1,11 @@
 <script>
 export default {
   props: {
-    criterioDeBusqueda: {
+    criterioNombre: {
+      type: String,
+      default: ''
+    },
+    criterioDni: {
       type: String,
       default: ''
     }
@@ -19,8 +23,30 @@ export default {
   computed: {
     personasFiltradas() {
       return this.personas.filter((persona) => {
-        let registroCompleto = `${persona.nombre} ${persona.apellido} ${persona.dni} ${persona.correo}`;
-        return registroCompleto.toLowerCase().includes(this.criterioDeBusqueda?.toLowerCase() || '');
+        let nombreCompleto = `${persona.nombre} ${persona.apellido}`;
+        let dni = persona.dni;
+
+        
+        if (!this.criterioNombre && !this.criterioDni) return true;
+
+     
+        if ((this.criterioNombre.length > 0 && this.criterioNombre.length < 3) || 
+            (this.criterioDni.length > 0 && this.criterioDni.length < 3)) {
+          return false;
+        }
+
+        
+        if (this.criterioNombre && !this.criterioDni) {
+          return nombreCompleto.toLowerCase().includes(this.criterioNombre.trim().toLowerCase());
+        }
+
+        if (!this.criterioNombre && this.criterioDni) {
+          return dni.includes(this.criterioDni);
+        }
+
+       
+        return nombreCompleto.toLowerCase().includes(this.criterioNombre.trim().toLowerCase()) &&
+               dni.includes(this.criterioDni);
       });
     }
   },
@@ -33,7 +59,7 @@ export default {
 </script>
 
 <template>
-  <div class="card-deck m-3">
+  <div class="card-deck m-0">
     <div class="row">
       <div class="col" v-for="persona in personasFiltradas" :key="persona.dni">
         <div class="card mb-3">
